@@ -156,17 +156,30 @@ impl PyClause {
 }
 
 #[pyfunction]
-fn compare(a: &str, b: &str) -> PyResult<i32> {
+fn compare(py: Python<'_>, a: &str, b: &str) -> PyResult<PyObject> {
     let va = RVersion::parse(a).map_err(|e| PyValueError::new_err(format!("{:?}", e)))?;
     let vb = RVersion::parse(b).map_err(|e| PyValueError::new_err(format!("{:?}", e)))?;
-    Ok(match va.sort_key().cmp(&vb.sort_key()) {
-        Ordering::Less => -1,
-        Ordering::Equal => 0,
-        Ordering::Greater => 1,
-    })
+
+    // Build metadata has no defined ordering (see DECISIONS.md: Ord vs
+    // PartialOrd). If everything but build differs, mirror the original
+    // library's behavior of returning NotImplemented rather than a
+    // fabricated -1/0/1.
+    let a_no_build = va.truncate_prerelease();
+    let b_no_build = vb.truncate_prerelease();
+    if a_no_build == b_no_build && va.build != vb.build {
+        return Ok(py.NotImplemented());
+    }
+
+    let result = match va.sort_key().cmp(&vb.sort_key()) {
+        Ordering::Less => -1i32,
+        Ordering::Equal => 0i32,
+        Ordering::Greater => 1i32,
+    };
+    Ok(result.into_py(py))
 }
 
 #[pyfunction]
+#[pyo3(name = "match")]
 fn match_(spec: &str, version: &str) -> PyResult<bool> {
     let s = RSimpleSpec::parse(spec).map_err(|e| PyValueError::new_err(e.to_string()))?;
     let v = RVersion::parse(version).map_err(|e| PyValueError::new_err(format!("{:?}", e)))?;
