@@ -1,0 +1,27 @@
+[package]
+name = "semver-rs"
+version = "0.1.0"
+edition = "2021"
+description = "A Rust port of rbarrois/python-semanticversion — Port_Mortem 2026 (Track D: Python -> Rust)"
+license = "BSD-2-Clause"
+
+[lib]
+name = "semver_rs"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# Kept intentionally minimal — this is pure parsing/comparison logic,
+# no I/O, no async, no heavy deps. Fewer deps = smaller unsafe surface
+# = easier shot at the Zero Unsafe bonus.
+
+# PyO3 is only needed if/when we build the adapter that lets the
+# ORIGINAL Python pytest suite run against this Rust code unmodified.
+# Uncomment once the core Version/Spec logic is stable:
+# pyo3 = { version = "0.22", features = ["extension-module"] }
+
+[dev-dependencies]
+proptest = "1"
+
+[profile.release]
+lto = true
+panic = "abort"
