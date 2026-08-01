@@ -1,0 +1,43 @@
+   Compiling semver-rs v0.1.0 (/Users/srivarshans/Downloads/semver-rs)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.00s
+     Running unittests src/lib.rs (target/debug/deps/semver_rs-86869c4251a18b21)
+
+running 29 tests
+test spec::tests::build_metadata_disallowed_outside_eq_neq ... ok
+test spec::tests::invalid_expression_rejected ... ok
+test spec::tests::caret_range_zero_major ... ok
+test spec::tests::not_equal_excludes_exact_version ... ok
+test npm_spec::tests::hyphen_range ... ok
+test spec::tests::caret_range ... ok
+test spec::tests::eq_matches_build_variants_but_not_prerelease ... ok
+test npm_spec::tests::caret_range ... ok
+test npm_spec::tests::x_range_minor ... ok
+test npm_spec::tests::or_ranges ... ok
+test spec::tests::prerelease_does_not_match_by_default ... ok
+test spec::tests::partial_major_only_equality ... ok
+test spec::tests::wildcard_major_matches_star ... ok
+test spec::tests::simple_gte ... ok
+test spec::tests::range_combination_with_comma ... ok
+test spec::tests::select_picks_highest_matching ... ok
+test version::tests::display_round_trips ... ok
+test version::tests::next_major_from_prerelease_zero_zero ... ok
+test version::tests::numeric_identifiers_sort_before_alpha ... ok
+test spec::tests::tilde_range ... ok
+test version::tests::numeric_prerelease_identifiers_compare_numerically ... ok
+test version::tests::parses_basic_version ... ok
+test version::tests::parses_prerelease_and_build ... ok
+test version::tests::prerelease_lt_or_eq_ignores_build ... ok
+test version::tests::rejects_incomplete_version ... ok
+test version::tests::rejects_leading_zero ... ok
+test version::tests::release_outranks_prerelease ... ok
+test version::tests::coerce_pads_missing_components ... ok
+test version::tests::coerce_extra_components_become_build ... ok
+
+test result: ok. 29 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+   Doc-tests semver_rs
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

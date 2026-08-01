@@ -123,13 +123,15 @@ fn parse_comparator(comp: &str) -> Result<Clause, SpecError> {
         ("", None, _, _) => Ok(Clause::Always), // bare "*"
         ("=" | "", Some(ma), None, _) => {
             let lo = full_version(ma, 0, 0, vec![], vec![]);
+            let hi = lo.next_major();
             Ok(Clause::Range(Range::simple(Operator::Gte, lo)?)
-                .and(Clause::Range(Range::simple(Operator::Lt, lo.next_major())?)))
+                .and(Clause::Range(Range::simple(Operator::Lt, hi)?)))
         }
         ("=" | "", Some(ma), Some(mi), None) => {
             let lo = full_version(ma, mi, 0, vec![], vec![]);
+            let hi = lo.next_minor();
             Ok(Clause::Range(Range::simple(Operator::Gte, lo)?)
-                .and(Clause::Range(Range::simple(Operator::Lt, lo.next_minor())?)))
+                .and(Clause::Range(Range::simple(Operator::Lt, hi)?)))
         }
         ("=" | "", Some(ma), Some(mi), Some(pa)) => {
             Ok(Clause::Range(Range::simple(Operator::Eq, full_version(ma, mi, pa, pre, build))?))

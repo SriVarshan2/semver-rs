@@ -270,6 +270,18 @@ impl Version {
         Version { major: self.major, minor: self.minor, patch: self.patch, prerelease: vec![], build: vec![] }
     }
 
+    /// Returns a clone with build metadata stripped (prerelease kept).
+    /// Used by Range::matches, mirroring the original's build-agnostic comparisons.
+    pub fn truncate_prerelease(&self) -> Version {
+        Version {
+            major: self.major,
+            minor: self.minor,
+            patch: self.patch,
+            prerelease: self.prerelease.clone(),
+            build: vec![],
+        }
+    }
+
     fn prerelease_key(&self) -> PrereleaseKey {
         if self.prerelease.is_empty() {
             PrereleaseKey::Max
