@@ -1,0 +1,652 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.9.6, pytest-8.4.2, pluggy-1.6.0 -- /Users/srivarshans/Downloads/semver-rs/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/srivarshans/Downloads/semver-rs
+configfile: pyproject.toml
+collecting ... collected 54 items
+
+tests/original/test_base.py::TopLevelTestCase::test_compare FAILED       [  1%]
+tests/original/test_base.py::TopLevelTestCase::test_match FAILED         [  3%]
+tests/original/test_base.py::TopLevelTestCase::test_validate_invalid PASSED [  5%]
+tests/original/test_base.py::TopLevelTestCase::test_validate_valid PASSED [  7%]
+tests/original/test_base.py::VersionTestCase::test_bump_clean_versions FAILED [  9%]
+tests/original/test_base.py::VersionTestCase::test_bump_prerelease_versions FAILED [ 11%]
+tests/original/test_base.py::VersionTestCase::test_compare_partial_to_self FAILED [ 12%]
+tests/original/test_base.py::VersionTestCase::test_compare_to_self PASSED [ 14%]
+tests/original/test_base.py::VersionTestCase::test_hash FAILED           [ 16%]
+tests/original/test_base.py::VersionTestCase::test_invalid_comparisons PASSED [ 18%]
+tests/original/test_base.py::VersionTestCase::test_parsing FAILED        [ 20%]
+tests/original/test_base.py::VersionTestCase::test_parsing_partials FAILED [ 22%]
+tests/original/test_base.py::VersionTestCase::test_stable_ordering FAILED [ 24%]
+tests/original/test_base.py::VersionTestCase::test_str PASSED            [ 25%]
+tests/original/test_base.py::VersionTestCase::test_str_partials FAILED   [ 27%]
+tests/original/test_base.py::VersionTestCase::test_subclass FAILED       [ 29%]
+tests/original/test_base.py::VersionTestCase::test_truncate FAILED       [ 31%]
+tests/original/test_base.py::SpecItemTestCase::test_components FAILED    [ 33%]
+tests/original/test_base.py::SpecItemTestCase::test_equality PASSED      [ 35%]
+tests/original/test_base.py::SpecItemTestCase::test_hash PASSED          [ 37%]
+tests/original/test_base.py::SpecItemTestCase::test_invalids FAILED      [ 38%]
+tests/original/test_base.py::SpecItemTestCase::test_matches FAILED       [ 40%]
+tests/original/test_base.py::SpecItemTestCase::test_to_string PASSED     [ 42%]
+tests/original/test_base.py::CoerceTestCase::test_coerce PASSED          [ 44%]
+tests/original/test_base.py::CoerceTestCase::test_invalid PASSED         [ 46%]
+tests/original/test_base.py::SpecTestCase::test_contains FAILED          [ 48%]
+tests/original/test_base.py::SpecTestCase::test_equality FAILED          [ 50%]
+tests/original/test_base.py::SpecTestCase::test_filter_compatible FAILED [ 51%]
+tests/original/test_base.py::SpecTestCase::test_filter_empty FAILED      [ 53%]
+tests/original/test_base.py::SpecTestCase::test_filter_incompatible FAILED [ 55%]
+tests/original/test_base.py::SpecTestCase::test_hash FAILED              [ 57%]
+tests/original/test_base.py::SpecTestCase::test_matches FAILED           [ 59%]
+tests/original/test_base.py::SpecTestCase::test_parsing FAILED           [ 61%]
+tests/original/test_base.py::SpecTestCase::test_parsing_split FAILED     [ 62%]
+tests/original/test_base.py::SpecTestCase::test_select_compatible FAILED [ 64%]
+tests/original/test_base.py::SpecTestCase::test_select_empty FAILED      [ 66%]
+tests/original/test_base.py::SpecTestCase::test_select_incompatible FAILED [ 68%]
+tests/original/test_match.py::MatchTestCase::test_build_check PASSED     [ 70%]
+tests/original/test_match.py::MatchTestCase::test_contains FAILED        [ 72%]
+tests/original/test_match.py::MatchTestCase::test_invalid PASSED         [ 74%]
+tests/original/test_match.py::MatchTestCase::test_match FAILED           [ 75%]
+tests/original/test_match.py::MatchTestCase::test_prerelease_check PASSED [ 77%]
+tests/original/test_match.py::MatchTestCase::test_simple FAILED          [ 79%]
+tests/original/test_npm.py::NpmSpecTests::test_expand FAILED             [ 81%]
+tests/original/test_npm.py::NpmSpecTests::test_spec FAILED               [ 83%]
+tests/original/test_parsing.py::ParsingTestCase::test_invalid FAILED     [ 85%]
+tests/original/test_parsing.py::ParsingTestCase::test_kwargs FAILED      [ 87%]
+tests/original/test_parsing.py::ParsingTestCase::test_simple PASSED      [ 88%]
+tests/original/test_parsing.py::ComparisonTestCase::test_comparisons PASSED [ 90%]
+tests/original/test_parsing.py::ComparisonTestCase::test_unordered FAILED [ 92%]
+tests/original/test_spec.py::FormatTests::test_build FAILED              [ 94%]
+tests/original/test_spec.py::FormatTests::test_major_minor_patch FAILED  [ 96%]
+tests/original/test_spec.py::FormatTests::test_precedence PASSED         [ 98%]
+tests/original/test_spec.py::FormatTests::test_prerelease FAILED         [100%]
+
+=================================== FAILURES ===================================
+________________________ TopLevelTestCase.test_compare _________________________
+
+self = <original.test_base.TopLevelTestCase testMethod=test_compare>
+
+    def test_compare(self):
+        for a, b, expected in self.versions:
+            with self.subTest(a=a, b=b):
+                result = base.compare(a, b)
+>               self.assertEqual(
+                    expected, result,
+                    "compare(%r, %r) should be %r instead of %r" % (a, b, expected, result))
+E               AssertionError: NotImplemented != 1 : compare('0.1.0-alpha+2', '0.1.0-alpha') should be NotImplemented instead of 1
+
+tests/original/test_base.py:36: AssertionError
+_________________________ TopLevelTestCase.test_match __________________________
+
+self = <original.test_base.TopLevelTestCase testMethod=test_match>
+
+    def test_match(self):
+        for spec, version in self.matches:
+            with self.subTest(spec=spec, version=version):
+                self.assertTrue(
+>                   base.match(spec, version),
+                    "%r should accept %r" % (spec, version))
+E               AttributeError: module 'base' has no attribute 'match'
+
+tests/original/test_base.py:51: AttributeError
+___________________ VersionTestCase.test_bump_clean_versions ___________________
+
+self = <original.test_base.VersionTestCase testMethod=test_bump_clean_versions>
+
+    def test_bump_clean_versions(self):
+        # We Test each property explicitly as the == comparator for versions
+        # does not distinguish between prerelease or builds for equality.
+    
+        v = base.Version('1.0.0+build')
+        v = v.next_major()
+>       self.assertEqual(v.major, 2)
+E       AttributeError: 'builtins.Version' object has no attribute 'major'
+
+tests/original/test_base.py:252: AttributeError
+________________ VersionTestCase.test_bump_prerelease_versions _________________
+
+self = <original.test_base.VersionTestCase testMethod=test_bump_prerelease_versions>
+
+    def test_bump_prerelease_versions(self):
+        # We Test each property explicitly as the == comparator for versions
+        # does not distinguish between prerelease or builds for equality.
+    
+        v = base.Version('1.0.0-pre+build')
+        v = v.next_major()
+>       self.assertEqual(v.major, 1)
+E       AttributeError: 'builtins.Version' object has no attribute 'major'
+
+tests/original/test_base.py:328: AttributeError
+_________________ VersionTestCase.test_compare_partial_to_self _________________
+
+self = <original.test_base.VersionTestCase testMethod=test_compare_partial_to_self>
+
+    def test_compare_partial_to_self(self):
+        for text in self.partial_versions:
+            with self.subTest(text=text):
+                self.assertEqual(
+>                   base.Version(text, partial=True),
+                    base.Version(text, partial=True))
+E               NotImplementedError: partial=True is not implemented in this port (see DECISIONS.md)
+
+tests/original/test_base.py:195: NotImplementedError
+__________________________ VersionTestCase.test_hash ___________________________
+
+self = <original.test_base.VersionTestCase testMethod=test_hash>
+
+    def test_hash(self):
+        self.assertEqual(
+            1,
+            len(set([base.Version('0.1.0'), base.Version('0.1.0')])))
+    
+        self.assertEqual(
+            2,
+>           len(set([base.Version('0.1.0'), base.Version('0.1.0', partial=True)])))
+E       NotImplementedError: partial=True is not implemented in this port (see DECISIONS.md)
+
+tests/original/test_base.py:206: NotImplementedError
+_________________________ VersionTestCase.test_parsing _________________________
+
+self = <original.test_base.VersionTestCase testMethod=test_parsing>
+
+    def test_parsing(self):
+        for text, expected_fields in self.versions.items():
+            with self.subTest(text=text):
+                version = base.Version(text)
+                actual_fields = (
+>                   version.major, version.minor, version.patch,
+                    version.prerelease, version.build)
+E               AttributeError: 'builtins.Version' object has no attribute 'major'
+
+tests/original/test_base.py:133: AttributeError
+____________________ VersionTestCase.test_parsing_partials _____________________
+
+self = <original.test_base.VersionTestCase testMethod=test_parsing_partials>
+
+    def test_parsing_partials(self):
+        for text, expected_fields in self.partial_versions.items():
+            with self.subTest(text=text):
+>               version = base.Version(text, partial=True)
+E               NotImplementedError: partial=True is not implemented in this port (see DECISIONS.md)
+
+tests/original/test_base.py:177: NotImplementedError
+_____________________ VersionTestCase.test_stable_ordering _____________________
+
+self = <original.test_base.VersionTestCase testMethod=test_stable_ordering>
+
+    def test_stable_ordering(self):
+        a = [
+            base.Version('0.1.0'),
+            base.Version('0.1.0+a'),
+            base.Version('0.1.0+a.1'),
+            base.Version('0.1.1-a1'),
+        ]
+        b = [a[1], a[3], a[0], a[2]]
+    
+        self.assertEqual(
+>           sorted(a, key=lambda v: v.precedence_key),
+            sorted(b, key=lambda v: v.precedence_key),
+        )
+
+tests/original/test_base.py:242: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+v = Version('0.1.0')
+
+>       sorted(a, key=lambda v: v.precedence_key),
+        sorted(b, key=lambda v: v.precedence_key),
+    )
+E   AttributeError: 'builtins.Version' object has no attribute 'precedence_key'
+
+tests/original/test_base.py:242: AttributeError
+______________________ VersionTestCase.test_str_partials _______________________
+
+self = <original.test_base.VersionTestCase testMethod=test_str_partials>
+
+    def test_str_partials(self):
+        for text in self.partial_versions:
+            with self.subTest(text=text):
+>               version = base.Version(text, partial=True)
+E               NotImplementedError: partial=True is not implemented in this port (see DECISIONS.md)
+
+tests/original/test_base.py:187: NotImplementedError
+________________________ VersionTestCase.test_subclass _________________________
+
+self = <original.test_base.VersionTestCase testMethod=test_subclass>
+
+    def test_subclass(self):
+        """Custom subclasses of Version returns instances of themselves."""
+>       class MyVersion(base.Version):
+E       TypeError: type 'builtins.Version' is not an acceptable base type
+
+tests/original/test_base.py:410: TypeError
+________________________ VersionTestCase.test_truncate _________________________
+
+self = <original.test_base.VersionTestCase testMethod=test_truncate>
+
+    def test_truncate(self):
+        v = base.Version("3.2.1-pre+build")
+>       self.assertEqual(v.truncate("build"), v)
+E       TypeError: Version.truncate() takes no arguments (1 given)
+
+tests/original/test_base.py:400: TypeError
+_______________________ SpecItemTestCase.test_components _______________________
+
+self = <original.test_base.SpecItemTestCase testMethod=test_components>
+
+    def test_components(self):
+        for spec_text, components in self.components.items():
+            with self.subTest(spec_text=spec_text):
+                kind, major, minor, patch, prerelease, build = components
+                spec = base.SpecItem(spec_text)
+    
+                self.assertEqual(kind, spec.kind)
+>               self.assertEqual(major, spec.spec.major)
+E               AttributeError: 'builtins.Version' object has no attribute 'major'
+
+tests/original/test_base.py:463: AttributeError
+________________________ SpecItemTestCase.test_invalids ________________________
+
+self = <original.test_base.SpecItemTestCase testMethod=test_invalids>
+
+    def test_invalids(self):
+        for invalid in self.invalids:
+            with self.subTest(invalid=invalid):
+                with self.assertRaises(ValueError, msg="SpecItem(%r) should be invalid" % invalid):
+>                   base.SpecItem(invalid)
+E                   AssertionError: ValueError not raised : SpecItem('<=0.1.1+build3') should be invalid
+
+tests/original/test_base.py:436: AssertionError
+________________________ SpecItemTestCase.test_matches _________________________
+
+self = <original.test_base.SpecItemTestCase testMethod=test_matches>
+
+    def test_matches(self):
+        for spec_text, versions in self.matches.items():
+            spec = base.SpecItem(spec_text)
+            matching, failing = versions
+    
+            for version_text in matching:
+                with self.subTest(spec=spec_text, version=version_text):
+                    version = base.Version(version_text)
+>                   self.assertTrue(spec.match(version), "%r should match %r" % (version, spec))
+E                   AttributeError: 'builtins.SpecItem' object has no attribute 'match'
+
+tests/original/test_base.py:572: AttributeError
+__________________________ SpecTestCase.test_contains __________________________
+
+self = <original.test_base.SpecTestCase testMethod=test_contains>
+
+    def test_contains(self):
+>       self.assertFalse('ii' in base.Spec('>=0.1.1'))
+E       TypeError: argument 'version': 'str' object cannot be converted to 'Version'
+
+tests/original/test_base.py:801: TypeError
+__________________________ SpecTestCase.test_equality __________________________
+
+self = <original.test_base.SpecTestCase testMethod=test_equality>
+
+    def test_equality(self):
+        for spec_list_text in self.examples:
+            with self.subTest(spec=spec_list_text):
+                slist1 = base.Spec(spec_list_text)
+                slist2 = base.Spec(spec_list_text)
+>               self.assertEqual(slist1, slist2)
+E               AssertionError: SimpleSpec('>=0.1.1,<0.1.2') != SimpleSpec('>=0.1.1,<0.1.2')
+
+tests/original/test_base.py:736: AssertionError
+_____________________ SpecTestCase.test_filter_compatible ______________________
+
+self = <original.test_base.SpecTestCase testMethod=test_filter_compatible>
+
+    def test_filter_compatible(self):
+        s = base.Spec('>=0.1.1,!=0.1.4,<0.2.0')
+>       res = tuple(s.filter([
+            base.Version('0.1.0'),
+            base.Version('0.1.1'),
+            base.Version('0.1.5'),
+            base.Version('0.1.4-alpha'),
+            base.Version('0.1.2'),
+            base.Version('0.2.0-rc1'),
+            base.Version('3.14.15'),
+        ]))
+E       AttributeError: 'builtins.SimpleSpec' object has no attribute 'filter'
+
+tests/original/test_base.py:755: AttributeError
+________________________ SpecTestCase.test_filter_empty ________________________
+
+self = <original.test_base.SpecTestCase testMethod=test_filter_empty>
+
+    def test_filter_empty(self):
+        s = base.Spec('>=0.1.1')
+>       res = tuple(s.filter(()))
+E       AttributeError: 'builtins.SimpleSpec' object has no attribute 'filter'
+
+tests/original/test_base.py:741: AttributeError
+____________________ SpecTestCase.test_filter_incompatible _____________________
+
+self = <original.test_base.SpecTestCase testMethod=test_filter_incompatible>
+
+    def test_filter_incompatible(self):
+        s = base.Spec('>=0.1.1,!=0.1.4')
+>       res = tuple(s.filter([
+            base.Version('0.1.0'),
+            base.Version('0.1.4'),
+            base.Version('0.1.4-alpha'),
+        ]))
+E       AttributeError: 'builtins.SimpleSpec' object has no attribute 'filter'
+
+tests/original/test_base.py:746: AttributeError
+____________________________ SpecTestCase.test_hash ____________________________
+
+self = <original.test_base.SpecTestCase testMethod=test_hash>
+
+    def test_hash(self):
+>       self.assertEqual(
+            1,
+            len(set([base.Spec('>=0.1.1'), base.Spec('>=0.1.1')])))
+E       AssertionError: 1 != 2
+
+tests/original/test_base.py:804: AssertionError
+__________________________ SpecTestCase.test_matches ___________________________
+
+self = <original.test_base.SpecTestCase testMethod=test_matches>
+
+    def test_matches(self):
+        for spec_list_text, versions in self.matches.items():
+            spec_list = base.Spec(spec_list_text)
+            matching, failing = versions
+    
+            for version_text in matching:
+                with self.subTest(spec=spec_list_text, matching=version_text):
+                    version = base.Version(version_text)
+                    self.assertTrue(
+                        version in spec_list,
+                        "%r should be in %r" % (version, spec_list))
+                    self.assertTrue(
+>                       spec_list.match(version),
+                        "%r should match %r" % (version, spec_list))
+E                   AttributeError: 'builtins.SimpleSpec' object has no attribute 'match'
+
+tests/original/test_base.py:718: AttributeError
+__________________________ SpecTestCase.test_parsing ___________________________
+
+self = <original.test_base.SpecTestCase testMethod=test_parsing>
+
+    def test_parsing(self):
+        for spec_list_text, specs in self.examples.items():
+            with self.subTest(spec=spec_list_text):
+                spec_list = base.Spec(spec_list_text)
+    
+>               self.assertEqual(spec_list_text, str(spec_list))
+E               AssertionError: '>=0.1.1,<0.1.2' != "SimpleSpec('>=0.1.1,<0.1.2')"
+E               - >=0.1.1,<0.1.2
+E               + SimpleSpec('>=0.1.1,<0.1.2')
+
+tests/original/test_base.py:659: AssertionError
+_______________________ SpecTestCase.test_parsing_split ________________________
+
+self = <original.test_base.SpecTestCase testMethod=test_parsing_split>
+
+    def test_parsing_split(self):
+        for spec_list_texts, specs in self.split_examples.items():
+            with self.subTest(spec=spec_list_texts):
+>               spec_list = base.Spec(*spec_list_texts)
+E               TypeError: SimpleSpec.__new__() takes 1 positional arguments but 3 were given
+
+tests/original/test_base.py:671: TypeError
+_____________________ SpecTestCase.test_select_compatible ______________________
+
+self = <original.test_base.SpecTestCase testMethod=test_select_compatible>
+
+    def test_select_compatible(self):
+        s = base.Spec('>=0.1.1,!=0.1.4,<0.2.0')
+>       res = s.select([
+            base.Version('0.1.0'),
+            base.Version('0.1.1'),
+            base.Version('0.1.5'),
+            base.Version('0.1.4-alpha'),
+            base.Version('0.1.2'),
+            base.Version('0.2.0-rc1'),
+            base.Version('3.14.15'),
+        ])
+E       AttributeError: 'builtins.SimpleSpec' object has no attribute 'select'
+
+tests/original/test_base.py:788: AttributeError
+________________________ SpecTestCase.test_select_empty ________________________
+
+self = <original.test_base.SpecTestCase testMethod=test_select_empty>
+
+    def test_select_empty(self):
+        s = base.Spec('>=0.1.1')
+>       self.assertIsNone(s.select(()))
+E       AttributeError: 'builtins.SimpleSpec' object has no attribute 'select'
+
+tests/original/test_base.py:775: AttributeError
+____________________ SpecTestCase.test_select_incompatible _____________________
+
+self = <original.test_base.SpecTestCase testMethod=test_select_incompatible>
+
+    def test_select_incompatible(self):
+        s = base.Spec('>=0.1.1,!=0.1.4')
+>       res = s.select([
+            base.Version('0.1.0'),
+            base.Version('0.1.4'),
+            base.Version('0.1.4-alpha'),
+        ])
+E       AttributeError: 'builtins.SimpleSpec' object has no attribute 'select'
+
+tests/original/test_base.py:779: AttributeError
+_________________________ MatchTestCase.test_contains __________________________
+
+self = <original.test_match.MatchTestCase testMethod=test_contains>
+
+    def test_contains(self):
+        spec = semantic_version.Spec('<=0.1.1')
+>       self.assertFalse('0.1.0' in spec, "0.1.0 should not be in %r" % spec)
+E       TypeError: argument 'version': 'str' object cannot be converted to 'Version'
+
+tests/original/test_match.py:154: TypeError
+___________________________ MatchTestCase.test_match ___________________________
+
+self = <original.test_match.MatchTestCase testMethod=test_match>
+
+    def test_match(self):
+        for spec_text, versions in self.matches.items():
+            for version_text in versions:
+                with self.subTest(spec=spec_text, version=version_text):
+                    spec = semantic_version.Spec(spec_text)
+                    self.assertNotEqual(spec, spec_text)
+                    version = semantic_version.Version(version_text)
+                    self.assertIn(version, spec)
+>                   self.assertTrue(spec.match(version), "%r does not match %r" % (version, spec))
+E                   AttributeError: 'builtins.SimpleSpec' object has no attribute 'match'
+
+tests/original/test_match.py:149: AttributeError
+__________________________ MatchTestCase.test_simple ___________________________
+
+self = <original.test_match.MatchTestCase testMethod=test_simple>
+
+    def test_simple(self):
+        for valid in self.valid_specs:
+            with self.subTest(spec=valid):
+>               spec = semantic_version.SpecItem(valid)
+E               ValueError: Invalid SpecItem: "*"
+
+tests/original/test_match.py:137: ValueError
+___________________________ NpmSpecTests.test_expand ___________________________
+
+self = <original.test_npm.NpmSpecTests testMethod=test_expand>
+
+    def test_expand(self):
+        for source, expanded in self.expansions.items():
+            with self.subTest(source=source):
+>               self.assertEqual(
+                    base.NpmSpec(source).clause,
+                    base.NpmSpec(expanded).clause,
+                )
+E               AssertionError: Always != Range(Range { operator: Gte, target: Vers[113 chars]it })
+
+tests/original/test_npm.py:109: AssertionError
+____________________________ NpmSpecTests.test_spec ____________________________
+
+self = <original.test_npm.NpmSpecTests testMethod=test_spec>
+
+    def test_spec(self):
+        for spec, lists in self.examples.items():
+            matching, failing = lists
+            for version in matching:
+                with self.subTest(spec=spec, version=version):
+>                   self.assertIn(base.Version(version), base.NpmSpec(spec))
+E                   AssertionError: Version('1.2.3-alpha.7') not found in NpmSpec('>1.2.3-alpha.3')
+
+tests/original/test_npm.py:63: AssertionError
+_________________________ ParsingTestCase.test_invalid _________________________
+
+self = <original.test_parsing.ParsingTestCase testMethod=test_invalid>
+
+    def test_invalid(self):
+        for invalid in self.invalids:
+            with self.subTest(version=invalid):
+>               self.assertRaises(ValueError, semantic_version.Version, invalid)
+E               TypeError: argument 'version_string': 'NoneType' object cannot be converted to 'PyString'
+
+tests/original/test_parsing.py:54: TypeError
+_________________________ ParsingTestCase.test_kwargs __________________________
+
+self = <original.test_parsing.ParsingTestCase testMethod=test_kwargs>
+
+    def test_kwargs(self):
+        for text, fields in self.valid_fields:
+            with self.subTest(version=text):
+                major, minor, patch, prerelease, build = fields
+>               version = semantic_version.Version(
+                    major=major,
+                    minor=minor,
+                    patch=patch,
+                    prerelease=prerelease,
+                    build=build,
+                )
+E               TypeError: Version.__new__() got an unexpected keyword argument 'major'
+
+tests/original/test_parsing.py:66: TypeError
+______________________ ComparisonTestCase.test_unordered _______________________
+
+self = <original.test_parsing.ComparisonTestCase testMethod=test_unordered>
+
+    def test_unordered(self):
+        for group in self.unordered:
+            for a, b in itertools.combinations(group, 2):
+                with self.subTest(a=a, b=b):
+                    v1 = semantic_version.Version(a)
+                    v2 = semantic_version.Version(b)
+                    self.assertTrue(v1 == v1, "%r != %r" % (v1, v1))
+                    self.assertFalse(v1 != v1, "%r != %r" % (v1, v1))
+                    self.assertFalse(v1 == v2, "%r == %r" % (v1, v2))
+                    self.assertTrue(v1 != v2, "%r !!= %r" % (v1, v2))
+>                   self.assertFalse(v1 < v2, "%r !< %r" % (v1, v2))
+E                   AssertionError: True is not false : Version('1.0.0-rc.1') !< Version('1.0.0-rc.1+build.1')
+
+tests/original/test_parsing.py:137: AssertionError
+____________________________ FormatTests.test_build ____________________________
+
+self = <original.test_spec.FormatTests testMethod=test_build>
+
+    def test_build(self):
+        # SPEC:
+        # Build metadata MAY be denoted by appending a plus sign and a series of
+        # dot separated identifiers immediately following the patch or
+        # pre-release version
+    
+        v = Version('1.2.3')
+>       self.assertEqual((), v.build)
+E       AttributeError: 'builtins.Version' object has no attribute 'build'
+
+tests/original/test_spec.py:97: AttributeError
+______________________ FormatTests.test_major_minor_patch ______________________
+
+self = <original.test_spec.FormatTests testMethod=test_major_minor_patch>
+
+    def test_major_minor_patch(self):
+        # SPEC:
+        # A normal version number MUST take the form X.Y.Z
+    
+        with self.assertRaises(ValueError):
+            Version('1')
+        with self.assertRaises(ValueError):
+            Version('1.1')
+        # Doesn't raise
+        Version('1.2.3')
+        with self.assertRaises(ValueError):
+            Version('1.2.3.4')
+    
+        # SPEC:
+        # Where X, Y, and Z are non-negative integers,
+    
+        with self.assertRaises(ValueError):
+            Version('1.2.A')
+        with self.assertRaises(ValueError):
+            Version('1.-2.3')
+        # Valid
+        v = Version('1.2.3')
+>       self.assertEqual(1, v.major)
+E       AttributeError: 'builtins.Version' object has no attribute 'major'
+
+tests/original/test_spec.py:41: AttributeError
+_________________________ FormatTests.test_prerelease __________________________
+
+self = <original.test_spec.FormatTests testMethod=test_prerelease>
+
+    def test_prerelease(self):
+        # SPEC:
+        # A pre-release version MAY be denoted by appending a hyphen and a
+        # series of dot separated identifiers immediately following the patch
+        # version.
+    
+        with self.assertRaises(ValueError):
+            Version('1.2.3 -23')
+        # Valid
+        v = Version('1.2.3-23')
+>       self.assertEqual(('23',), v.prerelease)
+E       AttributeError: 'builtins.Version' object has no attribute 'prerelease'
+
+tests/original/test_spec.py:69: AttributeError
+=========================== short test summary info ============================
+FAILED tests/original/test_base.py::TopLevelTestCase::test_compare - Assertio...
+FAILED tests/original/test_base.py::TopLevelTestCase::test_match - AttributeE...
+FAILED tests/original/test_base.py::VersionTestCase::test_bump_clean_versions
+FAILED tests/original/test_base.py::VersionTestCase::test_bump_prerelease_versions
+FAILED tests/original/test_base.py::VersionTestCase::test_compare_partial_to_self
+FAILED tests/original/test_base.py::VersionTestCase::test_hash - NotImplement...
+FAILED tests/original/test_base.py::VersionTestCase::test_parsing - Attribute...
+FAILED tests/original/test_base.py::VersionTestCase::test_parsing_partials - ...
+FAILED tests/original/test_base.py::VersionTestCase::test_stable_ordering - A...
+FAILED tests/original/test_base.py::VersionTestCase::test_str_partials - NotI...
+FAILED tests/original/test_base.py::VersionTestCase::test_subclass - TypeErro...
+FAILED tests/original/test_base.py::VersionTestCase::test_truncate - TypeErro...
+FAILED tests/original/test_base.py::SpecItemTestCase::test_components - Attri...
+FAILED tests/original/test_base.py::SpecItemTestCase::test_invalids - Asserti...
+FAILED tests/original/test_base.py::SpecItemTestCase::test_matches - Attribut...
+FAILED tests/original/test_base.py::SpecTestCase::test_contains - TypeError: ...
+FAILED tests/original/test_base.py::SpecTestCase::test_equality - AssertionEr...
+FAILED tests/original/test_base.py::SpecTestCase::test_filter_compatible - At...
+FAILED tests/original/test_base.py::SpecTestCase::test_filter_empty - Attribu...
+FAILED tests/original/test_base.py::SpecTestCase::test_filter_incompatible - ...
+FAILED tests/original/test_base.py::SpecTestCase::test_hash - AssertionError:...
+FAILED tests/original/test_base.py::SpecTestCase::test_matches - AttributeErr...
+FAILED tests/original/test_base.py::SpecTestCase::test_parsing - AssertionErr...
+FAILED tests/original/test_base.py::SpecTestCase::test_parsing_split - TypeEr...
+FAILED tests/original/test_base.py::SpecTestCase::test_select_compatible - At...
+FAILED tests/original/test_base.py::SpecTestCase::test_select_empty - Attribu...
+FAILED tests/original/test_base.py::SpecTestCase::test_select_incompatible - ...
+FAILED tests/original/test_match.py::MatchTestCase::test_contains - TypeError...
+FAILED tests/original/test_match.py::MatchTestCase::test_match - AttributeErr...
+FAILED tests/original/test_match.py::MatchTestCase::test_simple - ValueError:...
+FAILED tests/original/test_npm.py::NpmSpecTests::test_expand - AssertionError...
+FAILED tests/original/test_npm.py::NpmSpecTests::test_spec - AssertionError: ...
+FAILED tests/original/test_parsing.py::ParsingTestCase::test_invalid - TypeEr...
+FAILED tests/original/test_parsing.py::ParsingTestCase::test_kwargs - TypeErr...
+FAILED tests/original/test_parsing.py::ComparisonTestCase::test_unordered - A...
+FAILED tests/original/test_spec.py::FormatTests::test_build - AttributeError:...
+FAILED tests/original/test_spec.py::FormatTests::test_major_minor_patch - Att...
+FAILED tests/original/test_spec.py::FormatTests::test_prerelease - AttributeE...
+======================== 38 failed, 16 passed in 0.23s =========================
