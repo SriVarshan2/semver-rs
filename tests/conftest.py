@@ -6,11 +6,11 @@ test files are never modified.
 import pytest
 
 KNOWN_GAPS = {
-    "test_base.py::VersionTestCase::test_parsing_partial": "partial=True not implemented",
-    "test_base.py::VersionTestCase::test_repr_partial": "partial=True not implemented",
-    "test_base.py::VersionTestCase::test_hash_partial": "partial=True not implemented",
-    "test_npm.py::NpmSpecTestCase::test_clause_equality": "Clause simplify not implemented",
-    # Update these node IDs after first collection run — see below.
+    "test_base.py::VersionTestCase::test_compare_partial_to_self": "partial=True not implemented",
+    "test_base.py::VersionTestCase::test_hash": "partial=True not implemented (second assertion in test)",
+    "test_base.py::VersionTestCase::test_parsing_partials": "partial=True not implemented",
+    "test_base.py::VersionTestCase::test_str_partials": "partial=True not implemented",
+    "test_base.py::VersionTestCase::test_subclass": "subclass identity not preserved through method returns",
 }
 
 def pytest_collection_modifyitems(config, items):
