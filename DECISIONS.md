@@ -116,3 +116,33 @@ own prerelease" precedence rule.
 
 **Status:** `Version` module complete — parsing, `coerce()`, precedence
 comparison, `next_major/minor/patch`, `Display`. 12/12 tests passing.
+
+## [NpmSpec module complete] Reused Clause/Range engine, npm grammar only differs in parsing
+
+**What happened:** `Range::matches` depends on `Version::truncate_prerelease()`
+to strip build metadata before comparison. This method was referenced in an
+earlier handoff but never actually landed in `version.rs` — the gap only
+surfaced when `cargo test` was run against the real repo, not before. Fixed
+by adding the method (returns a clone with `build` cleared, `prerelease`
+kept) and re-running the full suite before considering the module done.
+
+**Also fixed:** Two borrow-checker errors in `npm_spec.rs`'s bare-version
+match arms (`==1`, `==1.2`) — the upper bound (`lo.next_major()` /
+`lo.next_minor()`) was being computed *after* `lo` had already been moved
+into the lower-bound `Range::simple` call. Fixed by computing the upper
+bound first and storing it, since `Version` intentionally does not derive
+`Copy` (it owns growable `Vec<String>` fields for prerelease/build
+identifiers).
+
+**Design decision:** `NpmSpec` does not reimplement range/clause matching —
+it only implements npm's parsing grammar (`^`, `~`, hyphen ranges, `x`/`X`/`*`
+wildcards, `||` for OR) and reuses `Clause`/`Range` from `spec.rs` for the
+actual matching logic. This keeps one source of truth for "does version X
+satisfy range Y" semantics, so any equivalence bug caught by the fuzz
+harness against `SimpleSpec` also protects `NpmSpec`, and vice versa.
+
+**Verification:** 29/29 tests passing (12 Version, 13 SimpleSpec, 4 NpmSpec)
+before this commit. Caret/tilde/hyphen/OR/x-range cases confirmed against
+python-semanticversion's own `npm_spec.py` test patterns.
+
+**Status:** NpmSpec module complete — parse(), matches(), select().
