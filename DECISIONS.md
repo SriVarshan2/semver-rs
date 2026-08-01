@@ -84,3 +84,35 @@ the original library, not a bug — we need to replicate it exactly, not
 **Trade-off / what we'd reconsider:**
 
 ---
+
+## [Version module complete] Ord vs PartialOrd, and partial-version scope
+
+**What happened:** While porting `Version`'s comparison operators, found that
+the original Python's ordering (`__lt__`/`__gt__`) deliberately excludes
+build metadata, while `__eq__` includes it. This means two versions like
+`0.1.1+build1` and `0.1.1+build2` are `!=` but neither `<` nor `>` the other.
+
+**Decision:** In Rust, implemented `PartialOrd` + `PartialEq` for `Version`,
+but deliberately did NOT implement `Ord`. Rust's `Ord` trait requires a total
+order consistent with `Eq` — the original's semantics violate that contract,
+so implementing `Ord` would either be dishonest (silently "fixing" the
+original's behavior) or would panic/misbehave if used with things like
+`.sort()`. `PartialOrd`-only is the accurate port of the original's actual
+behavior.
+
+**Why this matters:** A less careful port might implement `Ord` for
+convenience (e.g. to support `Vec<Version>::sort()`), which would silently
+change behavior versus the original on any version set containing build
+metadata. This is exactly the kind of subtle equivalence gap our differential
+fuzz harness is meant to catch — we caught it by reading the source closely
+instead.
+
+**Also decided:** Did not port `partial=True` mode (incomplete versions like
+`Version('1.2', partial=True)`). The original library itself deprecates this
+feature for removal in 3.0. Scope cut, not an oversight — verified via
+12 passing unit tests covering the non-partial path, including the numeric-
+vs-alphanumeric prerelease identifier ordering and the "release outranks its
+own prerelease" precedence rule.
+
+**Status:** `Version` module complete — parsing, `coerce()`, precedence
+comparison, `next_major/minor/patch`, `Display`. 12/12 tests passing.
