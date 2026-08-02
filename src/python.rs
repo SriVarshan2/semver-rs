@@ -82,8 +82,25 @@ impl PyVersion {
         PyTuple::new_bound(py, self.inner.build.iter().map(|s| s.as_str())).into()
     }
     #[getter]
-    fn precedence_key(&self) -> PyVersion {
-        self.clone()
+    fn precedence_key(&self, py: Python<'_>) -> PyObject {
+        use pyo3::types::PyTuple;
+        let v = &self.inner;
+        let prerelease_rank: i64 = if v.prerelease.is_empty() { 1 } else { 0 };
+        let prerelease_items: Vec<PyObject> = v.prerelease.iter().map(|s| {
+            if let Ok(n) = s.parse::<u64>() {
+                PyTuple::new_bound(py, &[0i64.into_py(py), n.into_py(py)]).into_py(py)
+            } else {
+                PyTuple::new_bound(py, &[1i64.into_py(py), s.clone().into_py(py)]).into_py(py)
+            }
+        }).collect();
+        PyTuple::new_bound(py, &[
+            v.major.into_py(py),
+            v.minor.into_py(py),
+            v.patch.into_py(py),
+            prerelease_rank.into_py(py),
+            prerelease_items.into_py(py),
+            v.build.clone().into_py(py),
+        ]).into_py(py)
     }
 
     fn __str__(&self) -> String {
@@ -94,7 +111,7 @@ impl PyVersion {
     }
     fn __richcmp__(&self, other: &PyVersion, op: pyo3::basic::CompareOp) -> bool {
         use pyo3::basic::CompareOp::*;
-        let ord = self.inner.sort_key().partial_cmp(&other.inner.sort_key());
+        let ord = self.inner.partial_cmp(&other.inner);
         match (op, ord) {
             (Eq, _) => self.inner == other.inner,
             (Ne, _) => self.inner != other.inner,
