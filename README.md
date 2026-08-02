@@ -30,6 +30,13 @@ The 5 `xfailed` cases are documented, deliberate scope cuts (not silent gaps) �
 
 `scripts/differential_fuzz.py` generates random version strings and range expressions, runs each through both this Rust-backed package and the real `semantic-version` PyPI package (in separate subprocess/venvs, since both share the same import name), and diffs the results. Full report: [FUZZ_REPORT.md](./FUZZ_REPORT.md).
 
+To re-run it yourself:
+```bash
+python3 -m venv .venv-pypi
+.venv-pypi/bin/pip install semantic-version
+python3 scripts/differential_fuzz.py 2000
+```
+
 **3. Verified in a clean container, not just locally**
 
 The Docker build compiles the Rust extension for Alpine/musl (Python 3.14) — a different OS, libc, and Python version than local dev (macOS, Python 3.9) — and the full test suite passes there too. See [Docker usage](#docker) below.
