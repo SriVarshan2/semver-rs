@@ -1,0 +1,88 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.9.6, pytest-8.4.2, pluggy-1.6.0 -- /Users/srivarshans/Downloads/semver-rs/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/srivarshans/Downloads/semver-rs
+configfile: pyproject.toml
+collecting ... collected 54 items
+
+tests/original/test_base.py::TopLevelTestCase::test_compare PASSED       [  1%]
+tests/original/test_base.py::TopLevelTestCase::test_match PASSED         [  3%]
+tests/original/test_base.py::TopLevelTestCase::test_validate_invalid PASSED [  5%]
+tests/original/test_base.py::TopLevelTestCase::test_validate_valid PASSED [  7%]
+tests/original/test_base.py::VersionTestCase::test_bump_clean_versions PASSED [  9%]
+tests/original/test_base.py::VersionTestCase::test_bump_prerelease_versions PASSED [ 11%]
+tests/original/test_base.py::VersionTestCase::test_compare_partial_to_self XFAIL [ 12%]
+tests/original/test_base.py::VersionTestCase::test_compare_to_self PASSED [ 14%]
+tests/original/test_base.py::VersionTestCase::test_hash XFAIL (parti...) [ 16%]
+tests/original/test_base.py::VersionTestCase::test_invalid_comparisons PASSED [ 18%]
+tests/original/test_base.py::VersionTestCase::test_parsing PASSED        [ 20%]
+tests/original/test_base.py::VersionTestCase::test_parsing_partials XFAIL [ 22%]
+tests/original/test_base.py::VersionTestCase::test_stable_ordering PASSED [ 24%]
+tests/original/test_base.py::VersionTestCase::test_str PASSED            [ 25%]
+tests/original/test_base.py::VersionTestCase::test_str_partials XFAIL    [ 27%]
+tests/original/test_base.py::VersionTestCase::test_subclass XFAIL (s...) [ 29%]
+tests/original/test_base.py::VersionTestCase::test_truncate PASSED       [ 31%]
+tests/original/test_base.py::SpecItemTestCase::test_components PASSED    [ 33%]
+tests/original/test_base.py::SpecItemTestCase::test_equality PASSED      [ 35%]
+tests/original/test_base.py::SpecItemTestCase::test_hash PASSED          [ 37%]
+tests/original/test_base.py::SpecItemTestCase::test_invalids PASSED      [ 38%]
+tests/original/test_base.py::SpecItemTestCase::test_matches PASSED       [ 40%]
+tests/original/test_base.py::SpecItemTestCase::test_to_string PASSED     [ 42%]
+tests/original/test_base.py::CoerceTestCase::test_coerce PASSED          [ 44%]
+tests/original/test_base.py::CoerceTestCase::test_invalid PASSED         [ 46%]
+tests/original/test_base.py::SpecTestCase::test_contains PASSED          [ 48%]
+tests/original/test_base.py::SpecTestCase::test_equality PASSED          [ 50%]
+tests/original/test_base.py::SpecTestCase::test_filter_compatible PASSED [ 51%]
+tests/original/test_base.py::SpecTestCase::test_filter_empty PASSED      [ 53%]
+tests/original/test_base.py::SpecTestCase::test_filter_incompatible PASSED [ 55%]
+tests/original/test_base.py::SpecTestCase::test_hash PASSED              [ 57%]
+tests/original/test_base.py::SpecTestCase::test_matches PASSED           [ 59%]
+tests/original/test_base.py::SpecTestCase::test_parsing PASSED           [ 61%]
+tests/original/test_base.py::SpecTestCase::test_parsing_split PASSED     [ 62%]
+tests/original/test_base.py::SpecTestCase::test_select_compatible PASSED [ 64%]
+tests/original/test_base.py::SpecTestCase::test_select_empty PASSED      [ 66%]
+tests/original/test_base.py::SpecTestCase::test_select_incompatible PASSED [ 68%]
+tests/original/test_match.py::MatchTestCase::test_build_check PASSED     [ 70%]
+tests/original/test_match.py::MatchTestCase::test_contains FAILED        [ 72%]
+tests/original/test_match.py::MatchTestCase::test_invalid PASSED         [ 74%]
+tests/original/test_match.py::MatchTestCase::test_match PASSED           [ 75%]
+tests/original/test_match.py::MatchTestCase::test_prerelease_check PASSED [ 77%]
+tests/original/test_match.py::MatchTestCase::test_simple FAILED          [ 79%]
+tests/original/test_npm.py::NpmSpecTests::test_expand PASSED             [ 81%]
+tests/original/test_npm.py::NpmSpecTests::test_spec PASSED               [ 83%]
+tests/original/test_parsing.py::ParsingTestCase::test_invalid PASSED     [ 85%]
+tests/original/test_parsing.py::ParsingTestCase::test_kwargs PASSED      [ 87%]
+tests/original/test_parsing.py::ParsingTestCase::test_simple PASSED      [ 88%]
+tests/original/test_parsing.py::ComparisonTestCase::test_comparisons PASSED [ 90%]
+tests/original/test_parsing.py::ComparisonTestCase::test_unordered PASSED [ 92%]
+tests/original/test_spec.py::FormatTests::test_build PASSED              [ 94%]
+tests/original/test_spec.py::FormatTests::test_major_minor_patch PASSED  [ 96%]
+tests/original/test_spec.py::FormatTests::test_precedence PASSED         [ 98%]
+tests/original/test_spec.py::FormatTests::test_prerelease PASSED         [100%]
+
+=================================== FAILURES ===================================
+_________________________ MatchTestCase.test_contains __________________________
+
+self = <original.test_match.MatchTestCase testMethod=test_contains>
+
+    def test_contains(self):
+        spec = semantic_version.Spec('<=0.1.1')
+>       self.assertFalse('0.1.0' in spec, "0.1.0 should not be in %r" % spec)
+E       AssertionError: True is not false : 0.1.0 should not be in SimpleSpec('<=0.1.1')
+
+tests/original/test_match.py:154: AssertionError
+__________________________ MatchTestCase.test_simple ___________________________
+
+self = <original.test_match.MatchTestCase testMethod=test_simple>
+
+    def test_simple(self):
+        for valid in self.valid_specs:
+            with self.subTest(spec=valid):
+>               spec = semantic_version.SpecItem(valid)
+E               ValueError: Invalid SpecItem: "*"
+
+tests/original/test_match.py:137: ValueError
+=========================== short test summary info ============================
+FAILED tests/original/test_match.py::MatchTestCase::test_contains - Assertion...
+FAILED tests/original/test_match.py::MatchTestCase::test_simple - ValueError:...
+=================== 2 failed, 47 passed, 5 xfailed in 0.69s ====================
