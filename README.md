@@ -37,6 +37,13 @@ python3 -m venv .venv-pypi
 python3 scripts/differential_fuzz.py 2000
 ```
 
+To re-run it yourself:
+```bash
+python3 -m venv .venv-pypi
+.venv-pypi/bin/pip install semantic-version
+python3 scripts/differential_fuzz.py 2000
+```
+
 **3. Verified in a clean container, not just locally**
 
 The Docker build compiles the Rust extension for Alpine/musl (Python 3.14) — a different OS, libc, and Python version than local dev (macOS, Python 3.9) — and the full test suite passes there too. See [Docker usage](#docker) below.
