@@ -4,6 +4,8 @@ A Rust port of [`rbarrois/python-semanticversion`](https://github.com/rbarrois/p
 
 Built for **Port_Mortem 2026** (Track D: Python → Rust).
 
+Original project licensed BSD-2-Clause; see [THIRD_PARTY_LICENSE](./THIRD_PARTY_LICENSE).
+
 ## Why this exists
 
 `semantic-version` is a small, pure-Python library for parsing, comparing, and matching semver version strings and range expressions (`>=1.2.0,<2.0.0`, npm-style `^1.2.3`, etc.). This project ports its core logic to Rust and wraps it so existing Python code can swap in the Rust implementation with zero code changes — `import semantic_version` resolves to this package.
