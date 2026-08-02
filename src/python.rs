@@ -178,17 +178,13 @@ impl PySimpleSpec {
     }
 
     fn __contains__(&self, item: &Bound<'_, PyAny>) -> bool {
-        let version = if let Ok(v) = item.extract::<PyVersion>() {
-            v.inner
-        } else if let Ok(s) = item.extract::<String>() {
-            match RVersion::parse(&s) {
-                Ok(v) => v,
-                Err(_) => return false,
-            }
-        } else {
-            return false;
-        };
-        self.inner.matches(&version)
+        // Only real Version objects are considered "in" a spec — a plain
+        // string is never treated as a version, matching the original
+        // library's behavior (test_match.py::test_contains).
+        match item.extract::<PyVersion>() {
+            Ok(v) => self.inner.matches(&v.inner),
+            Err(_) => false,
+        }
     }
 
     fn filter(&self, versions: Vec<PyVersion>) -> Vec<PyVersion> {

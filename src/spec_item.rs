@@ -68,6 +68,17 @@ static ITEM_RE: Lazy<Regex> = Lazy::new(|| {
 
 impl SpecItem {
     pub fn parse(expr: &str) -> Result<Self, String> {
+        if expr.trim() == "*" {
+            return Ok(SpecItem {
+                kind: Kind::Any,
+                major: 0,
+                minor: None,
+                patch: None,
+                prerelease: None,
+                build: None,
+                expression: expr.to_string(),
+            });
+        }
         let caps = ITEM_RE
             .captures(expr)
             .ok_or_else(|| format!("Invalid SpecItem: {:?}", expr))?;
@@ -215,6 +226,9 @@ impl SpecItem {
     }
 
     pub fn to_display_string(&self) -> String {
+        if self.kind == Kind::Any {
+            return "*".to_string();
+        }
         let mut s = format!("{}{}", self.kind.as_str(), self.major);
         if let Some(m) = self.minor {
             s.push_str(&format!(".{}", m));
