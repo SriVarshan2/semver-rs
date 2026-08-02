@@ -9,14 +9,14 @@
 
 use pyo3::exceptions::{PyNotImplementedError, PyValueError};
 use pyo3::prelude::*;
-use pyo3::types::PyType;
+use pyo3::types::{PyType, PyTuple};
 use std::cmp::Ordering;
 
 use crate::spec::{Clause as RClause, SimpleSpec as RSimpleSpec};
 use crate::npm_spec::NpmSpec as RNpmSpec;
 use crate::version::Version as RVersion;
 
-#[pyclass(name = "Version")]
+#[pyclass(name = "Version", subclass)]
 #[derive(Clone)]
 struct PyVersion {
     inner: RVersion,
@@ -53,8 +53,37 @@ impl PyVersion {
     fn next_patch(&self) -> PyVersion {
         PyVersion { inner: self.inner.next_patch() }
     }
-    fn truncate(&self) -> PyVersion {
-        PyVersion { inner: self.inner.truncate() }
+    #[pyo3(signature = (level="patch"))]
+    fn truncate(&self, level: &str) -> PyResult<PyVersion> {
+        let v = &self.inner;
+        let result = match level {
+            "major" => RVersion { major: v.major, minor: 0, patch: 0, prerelease: vec![], build: vec![] },
+            "minor" => RVersion { major: v.major, minor: v.minor, patch: 0, prerelease: vec![], build: vec![] },
+            "patch" => RVersion { major: v.major, minor: v.minor, patch: v.patch, prerelease: vec![], build: vec![] },
+            "prerelease" => RVersion { major: v.major, minor: v.minor, patch: v.patch, prerelease: v.prerelease.clone(), build: vec![] },
+            "build" => v.clone(),
+            other => return Err(PyValueError::new_err(format!("Invalid truncation level: {:?}", other))),
+        };
+        Ok(PyVersion { inner: result })
+    }
+
+    #[getter]
+    fn major(&self) -> u64 { self.inner.major }
+    #[getter]
+    fn minor(&self) -> u64 { self.inner.minor }
+    #[getter]
+    fn patch(&self) -> u64 { self.inner.patch }
+    #[getter]
+    fn prerelease(&self, py: Python<'_>) -> Py<PyTuple> {
+        PyTuple::new_bound(py, self.inner.prerelease.iter().map(|s| s.as_str())).into()
+    }
+    #[getter]
+    fn build(&self, py: Python<'_>) -> Py<PyTuple> {
+        PyTuple::new_bound(py, self.inner.build.iter().map(|s| s.as_str())).into()
+    }
+    #[getter]
+    fn precedence_key(&self) -> PyVersion {
+        self.clone()
     }
 
     fn __str__(&self) -> String {
@@ -94,19 +123,88 @@ struct PySimpleSpec {
 #[pymethods]
 impl PySimpleSpec {
     #[new]
-    fn new(expression: &str) -> PyResult<Self> {
-        RSimpleSpec::parse(expression)
+    #[pyo3(signature = (*parts))]
+    fn new(parts: Vec<String>) -> PyResult<Self> {
+        let expression = parts.join(",");
+        RSimpleSpec::parse(&expression)
             .map(|inner| PySimpleSpec { inner })
             .map_err(|e| PyValueError::new_err(e.to_string()))
     }
+
+    #[pyo3(name = "match")]
     fn match_(&self, version: &PyVersion) -> bool {
         self.inner.matches(&version.inner)
     }
-    fn __contains__(&self, version: &PyVersion) -> bool {
-        self.inner.matches(&version.inner)
+
+    fn __contains__(&self, item: &Bound<'_, PyAny>) -> bool {
+        let version = if let Ok(v) = item.extract::<PyVersion>() {
+            v.inner
+        } else if let Ok(s) = item.extract::<String>() {
+            match RVersion::parse(&s) {
+                Ok(v) => v,
+                Err(_) => return false,
+            }
+        } else {
+            return false;
+        };
+        self.inner.matches(&version)
+    }
+
+    fn filter(&self, versions: Vec<PyVersion>) -> Vec<PyVersion> {
+        versions.into_iter().filter(|v| self.inner.matches(&v.inner)).collect()
+    }
+
+    fn select(&self, versions: Vec<PyVersion>) -> Option<PyVersion> {
+        let refs: Vec<&RVersion> = versions.iter().map(|v| &v.inner).collect();
+        self.inner.select(refs).map(|v| PyVersion { inner: v.clone() })
+    }
+
+    fn __eq__(&self, other: &PySimpleSpec) -> bool {
+        self.inner.expression == other.inner.expression
+    }
+    fn __hash__(&self) -> u64 {
+        use std::collections::hash_map::DefaultHasher;
+        use std::hash::{Hash, Hasher};
+        let mut h = DefaultHasher::new();
+        self.inner.expression.hash(&mut h);
+        h.finish()
+    }
+
+    fn __str__(&self) -> String {
+        self.inner.expression.clone()
     }
     fn __repr__(&self) -> String {
         format!("SimpleSpec('{}')", self.inner.expression)
+    }
+    fn __iter__(&self, py: Python<'_>) -> PyResult<PyObject> {
+        fn op_str(op: &crate::spec::Operator) -> &'static str {
+            match op {
+                crate::spec::Operator::Eq => "==",
+                crate::spec::Operator::Neq => "!=",
+                crate::spec::Operator::Lt => "<",
+                crate::spec::Operator::Lte => "<=",
+                crate::spec::Operator::Gt => ">",
+                crate::spec::Operator::Gte => ">=",
+            }
+        }
+        fn collect(clause: &crate::spec::Clause, out: &mut Vec<String>) {
+            match clause {
+                crate::spec::Clause::Always | crate::spec::Clause::Never => {}
+                crate::spec::Clause::Range(r) => {
+                    out.push(format!("{}{}", op_str(&r.operator), r.target));
+                }
+                crate::spec::Clause::AllOf(v) | crate::spec::Clause::AnyOf(v) => {
+                    for c in v {
+                        collect(c, out);
+                    }
+                }
+            }
+        }
+        let mut parts = Vec::new();
+        collect(&self.inner.clause, &mut parts);
+        let list = pyo3::types::PyList::new_bound(py, parts);
+        let iter_obj = list.call_method0("__iter__")?;
+        Ok(iter_obj.unbind())
     }
 }
 
@@ -194,6 +292,7 @@ fn validate(version: &str) -> bool {
 fn register_common(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyVersion>()?;
     m.add_class::<PySpecItem>()?;
+    m.add_class::<PySpecTarget>()?;
     m.add_class::<PySimpleSpec>()?;
     m.add("Spec", m.getattr("SimpleSpec")?)?; // historical alias
     m.add_class::<PyNpmSpec>()?;
@@ -219,6 +318,40 @@ fn semantic_version(py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
 }
 
 use crate::spec_item::SpecItem as RSpecItem;
+
+/// Exposes SpecItem's raw components, preserving None (unmentioned in the
+/// pattern) vs Some(vec) (explicitly given, possibly empty) — a distinction
+/// a fully-resolved Version can't represent.
+#[pyclass(name = "_SpecTarget")]
+#[derive(Clone)]
+struct PySpecTarget {
+    major: u64,
+    minor: Option<u64>,
+    patch: Option<u64>,
+    prerelease: Option<Vec<String>>,
+    build: Option<Vec<String>>,
+}
+
+#[pymethods]
+impl PySpecTarget {
+    #[getter] fn major(&self) -> u64 { self.major }
+    #[getter] fn minor(&self) -> Option<u64> { self.minor }
+    #[getter] fn patch(&self) -> Option<u64> { self.patch }
+    #[getter]
+    fn prerelease(&self, py: Python<'_>) -> PyObject {
+        match &self.prerelease {
+            None => py.None(),
+            Some(v) => PyTuple::new_bound(py, v.iter().map(|s| s.as_str())).into_py(py),
+        }
+    }
+    #[getter]
+    fn build(&self, py: Python<'_>) -> PyObject {
+        match &self.build {
+            None => py.None(),
+            Some(v) => PyTuple::new_bound(py, v.iter().map(|s| s.as_str())).into_py(py),
+        }
+    }
+}
 
 #[pyclass(name = "SpecItem")]
 #[derive(Clone)]
@@ -271,16 +404,17 @@ impl PySpecItem {
     }
 
     #[getter]
-    fn spec(&self) -> PyVersion {
-        PyVersion { inner: crate::version::Version {
+    fn spec(&self) -> PySpecTarget {
+        PySpecTarget {
             major: self.inner.major,
-            minor: self.inner.minor.unwrap_or(0),
-            patch: self.inner.patch.unwrap_or(0),
-            prerelease: self.inner.prerelease.clone().unwrap_or_default(),
-            build: self.inner.build.clone().unwrap_or_default(),
-        }}
+            minor: self.inner.minor,
+            patch: self.inner.patch,
+            prerelease: self.inner.prerelease.clone(),
+            build: self.inner.build.clone(),
+        }
     }
 
+    #[pyo3(name = "match")]
     fn match_(&self, version: &PyVersion) -> bool {
         self.inner.matches(&version.inner)
     }
