@@ -25,13 +25,37 @@ struct PyVersion {
 #[pymethods]
 impl PyVersion {
     #[new]
-    #[pyo3(signature = (version_string, partial=false))]
-    fn new(version_string: &str, partial: bool) -> PyResult<Self> {
+    #[pyo3(signature = (version_string=None, partial=false, major=None, minor=None, patch=None, prerelease=None, build=None))]
+    fn new(
+        version_string: Option<&str>,
+        partial: bool,
+        major: Option<u64>,
+        minor: Option<u64>,
+        patch: Option<u64>,
+        prerelease: Option<Vec<String>>,
+        build: Option<Vec<String>>,
+    ) -> PyResult<Self> {
         if partial {
             return Err(PyNotImplementedError::new_err(
                 "partial=True is not implemented in this port (see DECISIONS.md)",
             ));
         }
+
+        if let Some(major) = major {
+            return Ok(PyVersion {
+                inner: RVersion {
+                    major,
+                    minor: minor.unwrap_or(0),
+                    patch: patch.unwrap_or(0),
+                    prerelease: prerelease.unwrap_or_default(),
+                    build: build.unwrap_or_default(),
+                },
+            });
+        }
+
+        let version_string = version_string
+            .ok_or_else(|| PyValueError::new_err("Invalid empty version string"))?;
+
         RVersion::parse(version_string)
             .map(|inner| PyVersion { inner })
             .map_err(|e| PyValueError::new_err(format!("{:?}", e)))
