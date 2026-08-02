@@ -13,9 +13,19 @@ Built for **Port_Mortem 2026** (Track D: Python → Rust).
 Two independent forms of evidence back the claim that this port behaves identically to the original:
 
 **1. The original library's own test suite, run unmodified against this Rust implementation**
+
+```
+49 passed, 5 xfailed in 0.74s
+```
+
 The 5 `xfailed` cases are documented, deliberate scope cuts (not silent gaps) — see [DECISIONS.md](./DECISIONS.md). The original test files live in `tests/original/`, copied verbatim at kickoff and SHA-256-hashed (`tests/original/HASHES.txt`) so they can never be quietly edited to make tests pass.
 
 **2. A differential fuzz harness comparing this port against the real PyPI package**
+
+```
+2000 cases, 2000 matches, 0 mismatches
+```
+
 `scripts/differential_fuzz.py` generates random version strings and range expressions, runs each through both this Rust-backed package and the real `semantic-version` PyPI package (in separate subprocess/venvs, since both share the same import name), and diffs the results. Full report: [FUZZ_REPORT.md](./FUZZ_REPORT.md).
 
 **3. Verified in a clean container, not just locally**
@@ -75,3 +85,20 @@ A few real trade-offs worth highlighting (full reasoning in [DECISIONS.md](./DEC
 - **`compare()` returns Python's `NotImplemented`**, not a fabricated `-1/0/1`, when two versions differ only in build metadata — build metadata has no defined ordering, matching the original's actual behavior.
 
 ## Project structure
+
+```
+src/
+  version.rs      Version parsing, comparison
+  spec.rs          SimpleSpec, Range, Clause combinators
+  npm_spec.rs      npm-style range parsing
+  spec_item.rs     Legacy SpecItem API
+  python.rs        PyO3 bindings exposing all of the above to Python
+tests/original/    Original library test suite, verbatim + hash-verified
+tests/conftest.py   Documented xfails for known scope cuts
+scripts/
+  differential_fuzz.py   Differential fuzzing driver
+  fuzz_worker.py         Subprocess worker
+  run_referee.sh          Docker entrypoint
+DECISIONS.md         Engineering decision log
+FUZZ_REPORT.md        Latest differential fuzz output
+```
