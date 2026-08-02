@@ -1,24 +1,22 @@
 # syntax=docker/dockerfile:1
-FROM rust:1.80-alpine AS builder
+FROM rust:alpine AS referee
 
-RUN apk add --no-cache musl-dev python3 python3-dev py3-pip
-
-WORKDIR /build
-COPY . .
-
-# Build the Rust crate (musl target, since we're on Alpine)
-RUN cargo build --release --target x86_64-unknown-linux-musl || cargo build --release
-
-# --- Referee stage: runs the differential fuzz / test-parity harness ---
-FROM rust:1.80-alpine AS referee
-
-RUN apk add --no-cache python3 py3-pip bash
+RUN apk add --no-cache python3 python3-dev py3-pip musl-dev bash patchelf
 
 WORKDIR /app
-COPY --from=builder /build /app
 
-# Install the original Python package so its test suite has something
-# to import for reference-value comparison during differential fuzzing.
-RUN pip install --break-system-packages semantic-version pytest || true
+# Install Python build/test tooling into system site-packages (NOT /app),
+# so it survives docker-compose's bind mount of the host tree over /app
+# at container startup.
+RUN pip install --break-system-packages --no-cache-dir maturin pytest
 
-CMD ["bash", "-c", "echo 'ferric-semver referee: run scripts/run_referee.sh'"]
+COPY . .
+
+# Build the Rust extension as an abi3 wheel and install it into system
+# site-packages — this is what makes `import semantic_version` resolve to
+# OUR Rust port rather than the PyPI package, and it persists after the
+# bind mount overlays /app at runtime.
+RUN maturin build --release --interpreter python3 \
+    && pip install --break-system-packages --no-cache-dir target/wheels/*.whl
+
+CMD ["bash", "scripts/run_referee.sh"]
