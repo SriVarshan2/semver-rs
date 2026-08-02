@@ -75,6 +75,23 @@ docker compose up referee
 
 This builds the Rust extension inside Alpine/musl, installs it as `semantic_version`, verifies the original test files are unmodified (hash check), confirms the Rust-backed module is what's actually imported, and runs the full test suite.
 
+## Architecture
+
+```mermaid
+graph LR
+    A[Python code<br/>import semantic_version] --> B[python.rs<br/>PyO3 bindings]
+    B --> C[version.rs<br/>Version]
+    B --> D[spec.rs<br/>SimpleSpec / Range / Clause]
+    B --> E[npm_spec.rs<br/>NpmSpec]
+    B --> F[spec_item.rs<br/>SpecItem legacy API]
+    D --> G[Match result<br/>returned to Python]
+    E --> G
+    C --> G
+    F --> G
+```
+
+Python calls a normal-looking package; every call is routed through the PyO3 binding layer into real Rust logic, with no Python fallback path.
+
 ## What's ported
 
 | Component | Description |
