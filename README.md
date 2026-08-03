@@ -34,6 +34,8 @@ To re-run it yourself:
 ```bash
 python3 -m venv .venv-pypi
 .venv-pypi/bin/pip install semantic-version
+python3 scripts/differential_fuzz.py 1500000   # full 60+ second run, matches fuzz_log_60s.txt
+# or, for a quick sanity check:
 python3 scripts/differential_fuzz.py 2000
 ```
 
